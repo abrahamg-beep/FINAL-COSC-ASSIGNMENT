@@ -1,0 +1,296 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+enum evidence 
+{
+    EMF5,
+    SPIRIT_BOX,
+    UV,
+    GHOST_ORB,
+    GHOST_WRITING,
+    FREEZING_TEMPS,
+    DOTS,
+    NONE
+};
+
+
+string evidenceToString(evidence e) 
+{
+    switch (e) 
+    {
+    case EMF5: return "EMF Level 5";
+    case SPIRIT_BOX: return "Spirit Box";
+    case UV: return "UV";
+    case GHOST_ORB: return "Ghost Orb";
+    case GHOST_WRITING: return "Ghost Writing";
+    case FREEZING_TEMPS: return "Freezing Temps";
+    case DOTS: return "D.O.T.S Projector";
+    default: return "None";
+    }
+}
+
+class ghost 
+{
+public:
+    string name;
+    vector<evidence> evidences;
+    string definitiveTell;
+
+    ghost(string n, vector<evidence> e, string d) 
+    {
+        name = n;
+        evidences = e;
+        definitiveTell = d;
+    }
+
+    void display() 
+    {
+        cout << "\nGhost: " << name << endl;
+        cout << "Evidence: ";
+        for (auto e : evidences) {
+            cout << evidenceToString(e) << ", ";
+        }
+        cout << "\nDescription: " << definitiveTell << endl;
+    }
+};
+
+class phasAssistant 
+{
+private:
+    vector<ghost> ghosts;
+    vector<evidence> collectedEvidence;
+
+public:
+    phasAssistant() 
+    {
+        initializeGhosts();
+    }
+
+    void initializeGhosts() 
+    {
+        ghosts.push_back(ghost("Banshee", {UV, GHOST_ORB, DOTS}, "A Banshee priortizes one player over everyone else and can only be a female model. Additonally, a Banshee's scream is unique and can be picked up on a parabolic microphone."));
+        ghosts.push_back(ghost("Dayan", {EMF5, GHOST_ORB, SPIRIT_BOX}, "Within 10m of a player, a Dayan speeds up when a player moves and slows down when a player stops moving. Additionally, can only be a female model."));
+        ghosts.push_back(ghost("Demon", {UV, GHOST_WRITING, FREEZING_TEMPS}, "Can hunt at any sanity and is able to hunt before 90 seconds after being smudged. Without being smudged, a Demon can hunt before 25s after a hunt ends or a crucifix has been used."));
+        ghosts.push_back(ghost("Deogen",{SPIRIT_BOX,GHOST_WRITING,DOTS}, "Forced Evidence: Spirit Box. Very fast when it is far away from a player and extremely slow when it is near a player. CAN NOT HIDE FROM A DEOGEN"));
+        ghosts.push_back(ghost("Gallu",{EMF5,UV,SPIRIT_BOX}, "A Gallu has three states it can cycle through. It is normal until it is enraged by salt, incense, or a crucifix. Once enraged, the Gallu is faster and does not disturb salt. After its enraged state it is slow and disturbs salt."));
+        ghosts.push_back(ghost("Goryo",{EMF5,UV,DOTS}, "Forced Evidence: DOTS. It is not a Goryo if the ghost changes its favorite room. A Goryo can only be seen in DOTS with a video camera, it will not show up with a living player present."));
+        ghosts.push_back(ghost("Hantu",{UV,GHOST_ORB,FREEZING_TEMPS}, "Forced Evvidence: Freezing. A Hantu has visible breath when it is hunting with the power off. If a ghosts changes speed without being influenced by equipment or the player, it is a Hantu."));
+        ghosts.push_back(ghost("Jinn",{EMF5,UV,FREEZING_TEMPS}, "A Jinn can not turn the power off. Additionally, a Jinn speeds up (with the power on) from more than 3m away when it sees you and then slows down within 3m of you."));
+        ghosts.push_back(ghost("Mare",{SPIRIT_BOX,GHOST_ORB,GHOST_WRITING}, "The Mare is the only ghost that can interact with a light switch during a ghost event. A Mare cannot turn on any light source."));
+        ghosts.push_back(ghost("Moroi",{SPIRIT_BOX,GHOST_WRITING,FREEZING_TEMPS}, "Forced Evidence: Spirit Box. A Moroi increases its speed based on the averge sanity. It is faster when sanity is lower and slower when sanity is higher."));
+        ghosts.push_back(ghost("Myling",{EMF5,UV,GHOST_WRITING}, "Cannot hear a Myling between 12m-20m"));
+        ghosts.push_back(ghost("Obake",{EMF5,UV,GHOST_ORB}, "Forced Evidence: UV. If the ghost shapeshifts while hunting, it is an Obake"));
+        ghosts.push_back(ghost("Obambo",{GHOST_WRITING,UV,DOTS}, "An Obambo can jump between fast and slow during the same hunt. As opposed to The Twins that can only stay one speed for the entire humt."));
+        ghosts.push_back(ghost("Oni",{EMF5,FREEZING_TEMPS,DOTS}, "An Oni is more visible than usual during a hunt. If there is a ghost mist event, it is NOT an Oni."));
+        ghosts.push_back(ghost("Onryo",{SPIRIT_BOX,GHOST_ORB,FREEZING_TEMPS}, "An Onryo can blow out the same firelight twice within 20s."));
+        ghosts.push_back(ghost("Phantom",{SPIRIT_BOX,UV,DOTS}, "The Phantom can not appear in photos/videos taken of it. Additionally, a Phantom is extremely hard to see during a hunt because of its time between blinks."));
+        ghosts.push_back(ghost("Poltergeist",{SPIRIT_BOX,UV,GHOST_WRITING}, "Make a pile of objects, if the objects are thrown a large distance, it is a Poltergeist."));
+        ghosts.push_back(ghost("Raiju",{EMF5,GHOST_ORB,DOTS}, "A Raiju's speed increases near electronics. It slows down when it is away from electronics."));
+        ghosts.push_back(ghost("Revenant",{GHOST_ORB,GHOST_WRITING,FREEZING_TEMPS}, "A Revenant, opposite of the Deogen, is slow when it does not know where a player is and extremely fast when it is aware of a player's position."));
+        ghosts.push_back(ghost("Shade",{EMF5,GHOST_WRITING,FREEZING_TEMPS}, "A Shade cannot hunt in the same room as the player."));
+        ghosts.push_back(ghost("Spirit",{EMF5,SPIRIT_BOX,GHOST_WRITING}, "A Spirit cannot hunt before 180s if it has been smudged."));
+        ghosts.push_back(ghost("Thaye",{GHOST_ORB, GHOST_WRITING,DOTS,}, "A Thaye has no line of sight speed buildup and gets slower after each hunt. Additionally, a Thaye is extremely aggressive as soon as a player enters its area."));
+        ghosts.push_back(ghost("The Mimic",{SPIRIT_BOX,UV,FREEZING_TEMPS}, "The Mimic always has fake evidence: Ghost Orbs."));
+        ghosts.push_back(ghost("The Twins",{EMF5,SPIRIT_BOX,FREEZING_TEMPS}, "The Twins can do two interactions at once and its speed will either be slower than normal or faster than normal during hunts."));
+        ghosts.push_back(ghost("Wraith",{EMF5,SPIRIT_BOX,DOTS}, "A Wraith can not step through salt."));
+        ghosts.push_back(ghost("Yokai",{SPIRIT_BOX,GHOST_ORB,DOTS}, "A Yokai cannot detect electronics or voices during a hunt unless it is within 2.5m of a player."));
+        ghosts.push_back(ghost("Yurei",{GHOST_ORB,FREEZING_TEMPS,DOTS}, "A Yurei can only fully open or close doors. If the ghost interacts with a door, outside of a hunt, without shutting or opening it, it is a Yurei."));
+    }
+
+    void displayMenu() 
+    {
+        cout << "\n==== PHASMOPHOBIA ASSISTANT ====\n";
+        cout << "1. Add Evidence\n";
+        cout << "2. Remove Evidence\n";
+        cout << "3. View Collected Evidence\n";
+        cout << "4. Show Possible Ghosts\n";
+        cout << "5. Show All Ghosts\n";
+        cout << "0. Exit\n";
+    }
+
+    void addEvidence()
+    {
+        int choice;
+        displayEvidenceOptions();
+        cin >> choice;
+
+        evidence e = choiceToEvidence(choice);
+
+        if (e == NONE) return;
+
+        if (find(collectedEvidence.begin(), collectedEvidence.end(), e) == collectedEvidence.end()) 
+        {
+            collectedEvidence.push_back(e);
+            cout << "Evidence added.\n";
+        }
+        else 
+        {
+            cout << "Already added.\n";
+        }
+    }
+
+    void removeEvidence()
+    {
+        int choice;
+        displayEvidenceOptions();
+        cin >> choice;
+
+        evidence e = choiceToEvidence(choice);
+
+        auto it = find(collectedEvidence.begin(), collectedEvidence.end(), e);
+
+        if (it != collectedEvidence.end()) 
+        {
+            collectedEvidence.erase(it);
+            cout << "Removed.\n";
+        }
+        else 
+        {
+            cout << "Not found.\n";
+        }
+    }
+
+    void displayEvidenceOptions() 
+    {
+        cout << "\nSelect Evidence:\n";
+        cout << "1. EMF Level 5\n";
+        cout << "2. Spirit Box\n";
+        cout << "3. UV\n";
+        cout << "4. Ghost Orb\n";
+        cout << "5. Ghost Writing\n";
+        cout << "6. Freezing Temps\n";
+        cout << "7. DOTS\n";
+    }
+
+    evidence choiceToEvidence(int choice) 
+    {
+        switch (choice) 
+        {
+        case 1: 
+                return EMF5;
+        case 2: 
+                return SPIRIT_BOX;
+        case 3:
+                return UV;
+        case 4:
+                return GHOST_ORB;
+        case 5: 
+                return GHOST_WRITING;
+        case 6: 
+                return FREEZING_TEMPS;
+        case 7: 
+                return DOTS;
+        default: 
+                return NONE;
+        }
+    }
+
+    void showCollectedEvidence() 
+    {
+        cout << "\nCollected Evidence:\n";
+        if (collectedEvidence.empty())
+        {
+            cout << "None\n";
+            return;
+        }
+
+        for (auto e : collectedEvidence) 
+        {
+            cout << "- " << evidenceToString(e) << endl;
+        }
+    }
+
+    void showPossibleGhosts() 
+    {
+        cout << "\nPossible Ghosts:\n";
+        bool found = false;
+
+        for (auto& ghost : ghosts) 
+        {
+            bool match = true;
+
+            for (auto e : collectedEvidence)
+            {
+                if (find(ghost.evidences.begin(), ghost.evidences.end(), e) == ghost.evidences.end())
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match) 
+            {
+                ghost.display();
+                found = true;
+            }
+        }
+
+        if (!found) 
+        {
+            cout << "No matching ghosts.\n";
+        }
+    }
+
+    void showAllGhosts()
+    {
+        for (auto& ghost : ghosts) 
+        {
+            ghost.display();
+        }
+    }
+
+    void run() 
+    {
+        int choice;
+
+        do 
+        {
+            displayMenu();
+            cin >> choice;
+
+            switch (choice) 
+            {
+            case 1:
+                    addEvidence(); 
+                    break;
+
+            case 2: 
+                    removeEvidence();
+                    break;
+
+            case 3: 
+                    showCollectedEvidence(); 
+                    break;
+
+            case 4: 
+                    showPossibleGhosts(); 
+                    break;
+
+            case 5: 
+                    showAllGhosts();
+                    break;
+
+            case 0: 
+                    cout << "Goodbye!\n";
+                    break;
+
+            default:
+                    cout << "Invalid choice.\n";
+            }
+
+        } 
+        
+        while (choice != 0);
+    }
+};
+
+int main() 
+{
+    phasAssistant app;
+    app.run();
+    return 0;
+}
